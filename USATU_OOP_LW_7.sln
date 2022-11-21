@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "USATU_OOP_LW_7", "USATU_OOP_LW_7\USATU_OOP_LW_7.csproj", "{809489C7-FF6B-4875-A5E5-791410179475}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomDoublyLinkedListLibrary", "CustomDoublyLinkedListLibrary\CustomDoublyLinkedListLibrary.csproj", "{F6B3029D-9660-4B2F-9BC1-493A21CF3FF8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{809489C7-FF6B-4875-A5E5-791410179475}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{809489C7-FF6B-4875-A5E5-791410179475}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{809489C7-FF6B-4875-A5E5-791410179475}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{809489C7-FF6B-4875-A5E5-791410179475}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6B3029D-9660-4B2F-9BC1-493A21CF3FF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6B3029D-9660-4B2F-9BC1-493A21CF3FF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6B3029D-9660-4B2F-9BC1-493A21CF3FF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6B3029D-9660-4B2F-9BC1-493A21CF3FF8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
