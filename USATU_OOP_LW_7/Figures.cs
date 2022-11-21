@@ -11,12 +11,6 @@ namespace USATU_OOP_LW_7
         Pentagon
     }
 
-    public enum ResizeAction
-    {
-        Increase,
-        Decrease
-    }
-
     public static class SelectionBorder
     {
         private const int SelectionBorderWidth = 5;
@@ -36,14 +30,13 @@ namespace USATU_OOP_LW_7
         }
     }
 
-    public abstract class Figure
+    public abstract class Figure : GraphicObject
     {
         protected Rectangle FigureRectangle;
         protected readonly SolidBrush CurrentBrush;
 
         private readonly Size _defaultSize = new Size(50, 50);
         private readonly Size _minimumSize = new Size(10, 10);
-        private bool _isSelected;
 
         protected Figure(Color color, Point centerLocation)
         {
@@ -53,14 +46,14 @@ namespace USATU_OOP_LW_7
             CurrentBrush = new SolidBrush(color);
         }
 
-        public bool IsFigureOutside(Size backgroundSize)
+        public override bool IsFigureOutside(Size backgroundSize)
         {
             return IsFigureOutside(FigureRectangle, backgroundSize);
         }
 
-        public void Color(Color newColor) => CurrentBrush.Color = newColor;
+        public override void Color(Color newColor) => CurrentBrush.Color = newColor;
 
-        public bool TryResize(int sizeK, ResizeAction resizeAction, Size backgroundSize)
+        private Rectangle GetResizedFigureRectangle(int sizeK, ResizeAction resizeAction)
         {
             var newFigureRectangle = new Rectangle();
             switch (resizeAction)
@@ -75,25 +68,41 @@ namespace USATU_OOP_LW_7
                     break;
             }
 
+            return newFigureRectangle;
+        }
+
+        public override bool IsResizePossible(int sizeK, ResizeAction resizeAction, Size backgroundSize)
+        {
+            var newFigureRectangle = GetResizedFigureRectangle(sizeK, resizeAction);
             if (IsFigureOutside(newFigureRectangle, backgroundSize) ||
                 newFigureRectangle.Size.Height < _minimumSize.Height ||
                 newFigureRectangle.Size.Width < _minimumSize.Width) return false;
-            FigureRectangle = newFigureRectangle;
             return true;
         }
 
-        public bool TryMove(Point moveVector, Size backgroundSize)
+        public override void Resize(int sizeK, ResizeAction resizeAction)
         {
-            var newFigureRectangle =
-                new Rectangle(
-                    new Point(FigureRectangle.Location.X + moveVector.X, FigureRectangle.Location.Y + moveVector.Y),
-                    FigureRectangle.Size);
-            if (IsFigureOutside(newFigureRectangle, backgroundSize)) return false;
-            FigureRectangle = newFigureRectangle;
-            return true;
+            FigureRectangle = GetResizedFigureRectangle(sizeK, resizeAction);
         }
 
-        public void DrawOnGraphics(Graphics graphics)
+        private Rectangle GetMovedFigureRectangle(Point moveVector)
+        {
+            return new Rectangle(
+                new Point(FigureRectangle.Location.X + moveVector.X, FigureRectangle.Location.Y + moveVector.Y),
+                FigureRectangle.Size);
+        }
+
+        public override bool IsMovePossible(Point moveVector, Size backgroundSize)
+        {
+            return !(IsFigureOutside(GetMovedFigureRectangle(moveVector), backgroundSize));
+        }
+
+        public override void Move(Point moveVector)
+        {
+            FigureRectangle = GetMovedFigureRectangle(moveVector);
+        }
+
+        public override void DrawOnGraphics(Graphics graphics)
         {
             DrawFigureOnGraphics(graphics);
             if (_isSelected)
@@ -102,27 +111,26 @@ namespace USATU_OOP_LW_7
             }
         }
 
-        public bool IsSelected()
+        public override bool IsSelected()
         {
             return _isSelected;
         }
 
-        public void Select()
+        public override void Select()
         {
             _isSelected = true;
         }
 
-        public void Unselect()
+        public override void Unselect()
         {
             _isSelected = false;
         }
 
-        public void ProcessClick()
+        public override void ProcessClick()
         {
             _isSelected = !_isSelected;
         }
 
-        public abstract bool IsPointInside(Point pointToCheck);
         protected abstract void DrawFigureOnGraphics(Graphics graphics);
 
         protected static bool IsUnderLine(Point firstLinePoint, Point secondLinePoint, Point checkPoint)
@@ -140,6 +148,11 @@ namespace USATU_OOP_LW_7
         {
             return 0 > figureRectangle.Left || figureRectangle.Right > backgroundSize.Width ||
                    backgroundSize.Height < figureRectangle.Bottom || figureRectangle.Top < 0;
+        }
+
+        public override bool IsGroup()
+        {
+            return false;
         }
     }
 

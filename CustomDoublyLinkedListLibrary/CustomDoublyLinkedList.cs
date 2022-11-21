@@ -119,13 +119,15 @@
             }
             else
             {
-                pointer.CurrentElement = new CustomDoublyLinkedList<T>.DoublyLinkedElement(objectToInsert,
+                var newCurrentElement = new CustomDoublyLinkedList<T>.DoublyLinkedElement(objectToInsert,
                     pointer.CurrentElement.Next, pointer.CurrentElement);
+                pointer.CurrentElement.Next.Previous = newCurrentElement;
+                pointer.CurrentElement.Next = newCurrentElement;  
                 Count++;
             }
         }
 
-        public void InsertBeforeCurrent(T objectToInsert, PointerCustomDoublyLinkedList<T> pointer)
+        public void InsertBeforePointer(T objectToInsert, PointerCustomDoublyLinkedList<T> pointer)
         {
             if (Count == 0)
             {
@@ -133,8 +135,10 @@
             }
             else
             {
-                pointer.CurrentElement = new CustomDoublyLinkedList<T>.DoublyLinkedElement(objectToInsert,
+                var newCurrentElement = new CustomDoublyLinkedList<T>.DoublyLinkedElement(objectToInsert,
                     pointer.CurrentElement, pointer.CurrentElement.Previous);
+                pointer.CurrentElement.Previous.Next = newCurrentElement;
+                pointer.CurrentElement.Previous = newCurrentElement;  
                 Count++;
             }
         }

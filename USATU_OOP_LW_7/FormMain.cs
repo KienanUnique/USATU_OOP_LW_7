@@ -9,24 +9,22 @@ namespace USATU_OOP_LW_7
         private const int ChangeSizeK = 2;
         private const int MoveLength = 10;
         private readonly Color _startColor = Color.Coral;
-        private readonly FiguresHandler _figuresHandler;
+        private readonly GraphicObjectsHandler _graphicObjectGroup;
         private bool _wasControlAlreadyPressed;
 
         public FormMain()
         {
             InitializeComponent();
-            _figuresHandler = new FiguresHandler(panelForDrawing.DisplayRectangle.Size);
+            _graphicObjectGroup = new GraphicObjectsHandler(panelForDrawing.DisplayRectangle.Size);
             this.KeyPreview = true;
 
             colorDialog.Color = _startColor;
             controlCurrentColor.BackColor = _startColor;
-
-            _figuresHandler.NeedUpdate += panelForDrawing_Update;
         }
 
         private void panelForDrawing_Paint(object sender, PaintEventArgs e)
         {
-            _figuresHandler.DrawAllCirclesOnGraphics(e.Graphics);
+            _graphicObjectGroup.DrawOnGraphics(e.Graphics);
         }
 
         private void panelForDrawing_Update()
@@ -60,15 +58,17 @@ namespace USATU_OOP_LW_7
         {
             if (e.Button == MouseButtons.Left)
             {
-                if (!_figuresHandler.TryProcessSelectionClick(e.Location))
+                if (!_graphicObjectGroup.TryProcessSelectionClick(e.Location))
                 {
-                    _figuresHandler.AddFigure(GetSelectedFigureEnum(), colorDialog.Color, e.Location);
+                    _graphicObjectGroup.AddFigure(GetSelectedFigureEnum(), colorDialog.Color, e.Location);
                 }
             }
             else if (e.Button == MouseButtons.Right)
             {
-                _figuresHandler.ProcessColorClick(e.Location, colorDialog.Color);
+                _graphicObjectGroup.ProcessColorClick(e.Location, colorDialog.Color);
             }
+
+            panelForDrawing_Update();
         }
 
         private void FormMain_KeyDown(object sender, KeyEventArgs e)
@@ -76,22 +76,24 @@ namespace USATU_OOP_LW_7
             switch (e.KeyCode)
             {
                 case Keys.ControlKey when !_wasControlAlreadyPressed:
-                    _figuresHandler.EnableMultipleSelection();
+                    _graphicObjectGroup.EnableMultipleSelection();
                     _wasControlAlreadyPressed = true;
                     break;
                 case Keys.W:
-                    _figuresHandler.MoveSelectedFigures(new Point(0, -1 * MoveLength));
+                    _graphicObjectGroup.MoveSelectedFigures(new Point(0, -1 * MoveLength));
                     break;
                 case Keys.S:
-                    _figuresHandler.MoveSelectedFigures(new Point(0, MoveLength));
+                    _graphicObjectGroup.MoveSelectedFigures(new Point(0, MoveLength));
                     break;
                 case Keys.A:
-                    _figuresHandler.MoveSelectedFigures(new Point(-1 * MoveLength, 0));
+                    _graphicObjectGroup.MoveSelectedFigures(new Point(-1 * MoveLength, 0));
                     break;
                 case Keys.D:
-                    _figuresHandler.MoveSelectedFigures(new Point(MoveLength, 0));
+                    _graphicObjectGroup.MoveSelectedFigures(new Point(MoveLength, 0));
                     break;
             }
+
+            panelForDrawing_Update();
         }
 
         private void FormMain_KeyUp(object sender, KeyEventArgs e)
@@ -99,19 +101,27 @@ namespace USATU_OOP_LW_7
             switch (e.KeyCode)
             {
                 case Keys.ControlKey:
-                    _figuresHandler.DisableMultipleSelection();
+                    _graphicObjectGroup.DisableMultipleSelection();
                     _wasControlAlreadyPressed = false;
                     break;
                 case Keys.Delete:
-                    _figuresHandler.DeleteAllSelected();
+                    _graphicObjectGroup.DeleteAllSelected();
                     break;
                 case Keys.Oemplus:
-                    _figuresHandler.ResizeSelectedFigures(ChangeSizeK, ResizeAction.Increase);
+                    _graphicObjectGroup.ResizeSelectedFigures(ChangeSizeK, ResizeAction.Increase);
                     break;
                 case Keys.OemMinus:
-                    _figuresHandler.ResizeSelectedFigures(ChangeSizeK, ResizeAction.Decrease);
+                    _graphicObjectGroup.ResizeSelectedFigures(ChangeSizeK, ResizeAction.Decrease);
+                    break;
+                case Keys.J:
+                    _graphicObjectGroup.JoinSelectedGraphicObject();
+                    break;
+                case Keys.U:
+                    _graphicObjectGroup.SeparateSelectedGraphicObjects();
                     break;
             }
+
+            panelForDrawing_Update();
         }
 
         private void buttonChooseColor_Click(object sender, EventArgs e)
