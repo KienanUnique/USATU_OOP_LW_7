@@ -11,3 +11,4 @@ C:\Users\wi\RiderProjects\USATU_OOP_LW_7\USATU_OOP_LW_7\obj\Debug\USATU_OOP_LW_7
 C:\Users\wi\RiderProjects\USATU_OOP_LW_7\USATU_OOP_LW_7\obj\Debug\USATU_OOP_LW_7.csproj.CopyComplete
 C:\Users\wi\RiderProjects\USATU_OOP_LW_7\USATU_OOP_LW_7\obj\Debug\USATU_OOP_LW_7.exe
 C:\Users\wi\RiderProjects\USATU_OOP_LW_7\USATU_OOP_LW_7\obj\Debug\USATU_OOP_LW_7.pdb
+C:\Users\wi\RiderProjects\USATU_OOP_LW_7\USATU_OOP_LW_7\obj\Debug\USATU_OOP_LW_7.FormMain.resources

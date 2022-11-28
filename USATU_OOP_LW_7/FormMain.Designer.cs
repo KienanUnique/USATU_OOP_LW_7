@@ -29,6 +29,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormMain));
             this.panelForDrawing = new System.Windows.Forms.Panel();
             this.colorDialog = new System.Windows.Forms.ColorDialog();
             this.panelColorChoose = new System.Windows.Forms.Panel();
@@ -152,7 +153,7 @@
             this.textBoxControlPromts.ReadOnly = true;
             this.textBoxControlPromts.Size = new System.Drawing.Size(150, 196);
             this.textBoxControlPromts.TabIndex = 3;
-            this.textBoxControlPromts.Text = "=== Control prompts ===\r\nSelect: LeftClick\r\nMultiselect: Ctrl + LeftClick\r\nDelete" + ": Del\r\nPaint: RightClick\r\nIncrease size: +\r\nDecrease size: -\r\nMove up: W\r\nMove d" + "own: S\r\nMove left: A\r\nMove right: D";
+            this.textBoxControlPromts.Text = resources.GetString("textBoxControlPromts.Text");
             this.textBoxControlPromts.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // FormMain

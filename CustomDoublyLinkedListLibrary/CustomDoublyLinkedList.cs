@@ -85,62 +85,83 @@
 
         public void RemovePointerElement(PointerCustomDoublyLinkedList<T> pointer)
         {
-            pointer.CurrentElement.Previous.Next = pointer.CurrentElement.Next;
-            pointer.CurrentElement.Next.Previous = pointer.CurrentElement.Previous;
-            if (pointer.CurrentElement.Next.IsBorder && !pointer.CurrentElement.Previous.IsBorder)
+            switch (pointer.CurrentElement.Next.IsBorder)
             {
-                pointer.CurrentElement = pointer.CurrentElement.Previous;
-                _lastElement = pointer.CurrentElement;
-            }
-            else if (!pointer.CurrentElement.Next.IsBorder && pointer.CurrentElement.Previous.IsBorder)
-            {
-                pointer.CurrentElement = pointer.CurrentElement.Previous;
-                _firstElement = pointer.CurrentElement.Next;
-            }
-            else if (pointer.CurrentElement.Next.IsBorder && pointer.CurrentElement.Previous.IsBorder)
-            {
-                pointer.CurrentElement = pointer.CurrentElement.Previous;
-                _firstElement = pointer.CurrentElement;
-                _lastElement = pointer.CurrentElement.Next;
-            }
-            else if (!pointer.CurrentElement.Next.IsBorder && !pointer.CurrentElement.Previous.IsBorder)
-            {
-                pointer.CurrentElement = pointer.CurrentElement.Previous;
+                case true when !pointer.CurrentElement.Previous.IsBorder:
+                    _lastElement = pointer.CurrentElement.Previous;
+                    _lastElement.Next = pointer.CurrentElement.Next;
+                    pointer.CurrentElement.Next.Previous = _lastElement;
+                    break;
+                case true when pointer.CurrentElement.Previous.IsBorder:
+                    _firstElement = pointer.CurrentElement.Previous;
+                    _lastElement = pointer.CurrentElement.Next;
+                    break;
+                case false when pointer.CurrentElement.Previous.IsBorder:
+                    _firstElement = pointer.CurrentElement.Next;
+                    _firstElement.Previous = pointer.CurrentElement.Previous;
+                    pointer.CurrentElement.Previous.Next = _firstElement;
+                    break;
             }
 
+            pointer.CurrentElement.Previous.Next = pointer.CurrentElement.Next;
+            pointer.CurrentElement.Next.Previous = pointer.CurrentElement.Previous;
             Count--;
         }
 
-        public void InsertAfterPointer(T objectToInsert, PointerCustomDoublyLinkedList<T> pointer)
+        public void InsertListAfterPointer(CustomDoublyLinkedList<T> listToInsert,
+            PointerCustomDoublyLinkedList<T> pointer)
         {
             if (Count == 0)
             {
-                Add(objectToInsert);
+                _firstElement = listToInsert._firstElement;
+                _lastElement = listToInsert._lastElement;
+                pointer.CurrentElement = _firstElement;
             }
             else
             {
-                var newCurrentElement = new CustomDoublyLinkedList<T>.DoublyLinkedElement(objectToInsert,
-                    pointer.CurrentElement.Next, pointer.CurrentElement);
-                pointer.CurrentElement.Next.Previous = newCurrentElement;
-                pointer.CurrentElement.Next = newCurrentElement;  
-                Count++;
+                if (pointer.CurrentElement.Next.IsBorder)
+                {
+                    _lastElement = listToInsert._lastElement;
+                }
+                else
+                {
+                    pointer.CurrentElement.Next.Previous = listToInsert._lastElement;
+                    listToInsert._lastElement.Next = pointer.CurrentElement.Next;
+                }
+
+                pointer.CurrentElement.Next = listToInsert._firstElement;
+                listToInsert._firstElement.Previous = pointer.CurrentElement;
             }
+
+            Count += listToInsert.Count;
         }
 
-        public void InsertBeforePointer(T objectToInsert, PointerCustomDoublyLinkedList<T> pointer)
+        public void InsertListBeforePointer(CustomDoublyLinkedList<T> listToInsert,
+            PointerCustomDoublyLinkedList<T> pointer)
         {
             if (Count == 0)
             {
-                Add(objectToInsert);
+                _firstElement = listToInsert._firstElement;
+                _lastElement = listToInsert._lastElement;
+                pointer.CurrentElement = _firstElement;
             }
             else
             {
-                var newCurrentElement = new CustomDoublyLinkedList<T>.DoublyLinkedElement(objectToInsert,
-                    pointer.CurrentElement, pointer.CurrentElement.Previous);
-                pointer.CurrentElement.Previous.Next = newCurrentElement;
-                pointer.CurrentElement.Previous = newCurrentElement;  
-                Count++;
+                if (pointer.CurrentElement.Previous.IsBorder)
+                {
+                    _firstElement = listToInsert._firstElement;
+                }
+                else
+                {
+                    pointer.CurrentElement.Previous.Next = listToInsert._firstElement;
+                    listToInsert._firstElement.Previous = pointer.CurrentElement.Previous;
+                }
+
+                pointer.CurrentElement.Previous = listToInsert._lastElement;
+                listToInsert._lastElement.Next = pointer.CurrentElement;
             }
+
+            Count += listToInsert.Count;
         }
     }
 

@@ -30,6 +30,7 @@ public class GraphicObjectsHandler
         }
 
         _graphicObjects.Add(newGraphicObjectGroup);
+        UnselectAll();
     }
 
     public void SeparateSelectedGraphicObjects()
@@ -39,14 +40,12 @@ public class GraphicObjectsHandler
             if (i.Current.IsSelected() && i.Current.IsGroup())
             {
                 var currentGroupList = ((GraphicObjectGroup) i.Current).GetAllGraphicObjects();
-                for (var k = currentGroupList.GetPointerOnBeginning(); !k.IsBorderReached(); k.MoveNext())
-                {
-                    _graphicObjects.InsertBeforePointer(k.Current, i);
-                }
-
+                _graphicObjects.InsertListBeforePointer(currentGroupList, i);
                 _graphicObjects.RemovePointerElement(i);
             }
         }
+
+        UnselectAll();
     }
 
     public void DrawOnGraphics(Graphics graphics)

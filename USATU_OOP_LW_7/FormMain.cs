@@ -81,19 +81,21 @@ namespace USATU_OOP_LW_7
                     break;
                 case Keys.W:
                     _graphicObjectGroup.MoveSelectedFigures(new Point(0, -1 * MoveLength));
+                    panelForDrawing_Update();
                     break;
                 case Keys.S:
                     _graphicObjectGroup.MoveSelectedFigures(new Point(0, MoveLength));
+                    panelForDrawing_Update();
                     break;
                 case Keys.A:
                     _graphicObjectGroup.MoveSelectedFigures(new Point(-1 * MoveLength, 0));
+                    panelForDrawing_Update();
                     break;
                 case Keys.D:
                     _graphicObjectGroup.MoveSelectedFigures(new Point(MoveLength, 0));
+                    panelForDrawing_Update();
                     break;
             }
-
-            panelForDrawing_Update();
         }
 
         private void FormMain_KeyUp(object sender, KeyEventArgs e)
@@ -106,22 +108,25 @@ namespace USATU_OOP_LW_7
                     break;
                 case Keys.Delete:
                     _graphicObjectGroup.DeleteAllSelected();
+                    panelForDrawing_Update();
                     break;
                 case Keys.Oemplus:
                     _graphicObjectGroup.ResizeSelectedFigures(ChangeSizeK, ResizeAction.Increase);
+                    panelForDrawing_Update();
                     break;
                 case Keys.OemMinus:
                     _graphicObjectGroup.ResizeSelectedFigures(ChangeSizeK, ResizeAction.Decrease);
+                    panelForDrawing_Update();
                     break;
                 case Keys.J:
                     _graphicObjectGroup.JoinSelectedGraphicObject();
+                    panelForDrawing_Update();
                     break;
                 case Keys.U:
                     _graphicObjectGroup.SeparateSelectedGraphicObjects();
+                    panelForDrawing_Update();
                     break;
             }
-
-            panelForDrawing_Update();
         }
 
         private void buttonChooseColor_Click(object sender, EventArgs e)
