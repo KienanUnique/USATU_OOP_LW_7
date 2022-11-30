@@ -1,20 +1,17 @@
 ﻿using System.Drawing;
+using System.IO;
+using System.Text;
 
 namespace USATU_OOP_LW_7
 {
-    public enum Figures
+    public enum GraphicObjectsTypes
     {
         None,
         Circle,
         Triangle,
         Square,
-        Pentagon
-    }
-
-    public enum ResizeAction
-    {
-        Increase,
-        Decrease
+        Pentagon,
+        Group
     }
 
     public static class SelectionBorder
@@ -36,14 +33,29 @@ namespace USATU_OOP_LW_7
         }
     }
 
-    public abstract class Figure
+    public abstract class Figure : GraphicObject
     {
         protected Rectangle FigureRectangle;
         protected readonly SolidBrush CurrentBrush;
+        protected abstract GraphicObjectsTypes GraphicObjectsTypeType { get; }
 
         private readonly Size _defaultSize = new Size(50, 50);
+        private readonly Point _defaultLocation = new Point(0,0);
+        private readonly Color _defaultColor = System.Drawing.Color.Black;
         private readonly Size _minimumSize = new Size(10, 10);
-        private bool _isSelected;
+
+        private const string PrefixSizeWidth = "Size width: ";
+        private const string PrefixSizeHeight = "Size height: ";
+        private const string PrefixLeftTopPointX = "Left top point X: ";
+        private const string PrefixLeftTopPointY = "Left top point Y: ";
+        private const string PrefixColor = "Color: ";
+        private const string PrefixFigureType = "Figure type: ";
+
+        public Figure()
+        {
+            FigureRectangle = new Rectangle(_defaultLocation, _defaultSize);
+            CurrentBrush = new SolidBrush(_defaultColor);
+        }
 
         protected Figure(Color color, Point centerLocation)
         {
@@ -53,14 +65,26 @@ namespace USATU_OOP_LW_7
             CurrentBrush = new SolidBrush(color);
         }
 
-        public bool IsFigureOutside(Size backgroundSize)
+        public override void loadData(StringReader dataStringReader)
+        {
+            int.TryParse(dataStringReader.ReadLine(), out int readWidth);
+            int.TryParse(dataStringReader.ReadLine(), out int readHeight);
+            int.TryParse(dataStringReader.ReadLine(), out int readLocationX);
+            int.TryParse(dataStringReader.ReadLine(), out int readLocationY);
+            int.TryParse(dataStringReader.ReadLine(), out int readColor);
+            FigureRectangle.Size = new Size(readWidth, readHeight);
+            FigureRectangle.Location = new Point(readLocationX, readLocationY);
+            CurrentBrush.Color = ColorTranslator.FromOle(readColor);
+        }
+
+        public override bool IsFigureOutside(Size backgroundSize)
         {
             return IsFigureOutside(FigureRectangle, backgroundSize);
         }
 
-        public void Color(Color newColor) => CurrentBrush.Color = newColor;
+        public override void Color(Color newColor) => CurrentBrush.Color = newColor;
 
-        public bool TryResize(int sizeK, ResizeAction resizeAction, Size backgroundSize)
+        private Rectangle GetResizedFigureRectangle(int sizeK, ResizeAction resizeAction)
         {
             var newFigureRectangle = new Rectangle();
             switch (resizeAction)
@@ -75,54 +99,69 @@ namespace USATU_OOP_LW_7
                     break;
             }
 
+            return newFigureRectangle;
+        }
+
+        public override bool IsResizePossible(int sizeK, ResizeAction resizeAction, Size backgroundSize)
+        {
+            var newFigureRectangle = GetResizedFigureRectangle(sizeK, resizeAction);
             if (IsFigureOutside(newFigureRectangle, backgroundSize) ||
                 newFigureRectangle.Size.Height < _minimumSize.Height ||
                 newFigureRectangle.Size.Width < _minimumSize.Width) return false;
-            FigureRectangle = newFigureRectangle;
             return true;
         }
 
-        public bool TryMove(Point moveVector, Size backgroundSize)
+        public override void Resize(int sizeK, ResizeAction resizeAction)
         {
-            var newFigureRectangle =
-                new Rectangle(
-                    new Point(FigureRectangle.Location.X + moveVector.X, FigureRectangle.Location.Y + moveVector.Y),
-                    FigureRectangle.Size);
-            if (IsFigureOutside(newFigureRectangle, backgroundSize)) return false;
-            FigureRectangle = newFigureRectangle;
-            return true;
+            FigureRectangle = GetResizedFigureRectangle(sizeK, resizeAction);
         }
 
-        public void DrawOnGraphics(Graphics graphics)
+        private Rectangle GetMovedFigureRectangle(Point moveVector)
+        {
+            return new Rectangle(
+                new Point(FigureRectangle.Location.X + moveVector.X, FigureRectangle.Location.Y + moveVector.Y),
+                FigureRectangle.Size);
+        }
+
+        public override bool IsMovePossible(Point moveVector, Size backgroundSize)
+        {
+            return !(IsFigureOutside(GetMovedFigureRectangle(moveVector), backgroundSize));
+        }
+
+        public override void Move(Point moveVector)
+        {
+            FigureRectangle = GetMovedFigureRectangle(moveVector);
+        }
+
+        public override void DrawOnGraphics(Graphics graphics)
         {
             DrawFigureOnGraphics(graphics);
-            if (_isSelected)
+            if (IsSelected)
             {
                 DrawSelectionBorders(graphics);
             }
         }
 
-        public bool IsSelected()
+        public override bool IsObjectSelected()
         {
-            return _isSelected;
+            return IsSelected;
         }
 
-        public void Select()
+        public override void Select()
         {
-            _isSelected = true;
+            IsSelected = true;
         }
 
-        public void Unselect()
+        public override void Unselect()
         {
-            _isSelected = false;
+            IsSelected = false;
         }
 
-        public void ProcessClick()
+        public override void ProcessClick()
         {
-            _isSelected = !_isSelected;
+            IsSelected = !IsSelected;
         }
 
-        public abstract bool IsPointInside(Point pointToCheck);
         protected abstract void DrawFigureOnGraphics(Graphics graphics);
 
         protected static bool IsUnderLine(Point firstLinePoint, Point secondLinePoint, Point checkPoint)
@@ -141,12 +180,36 @@ namespace USATU_OOP_LW_7
             return 0 > figureRectangle.Left || figureRectangle.Right > backgroundSize.Width ||
                    backgroundSize.Height < figureRectangle.Bottom || figureRectangle.Top < 0;
         }
+
+        public override bool IsGroup()
+        {
+            return false;
+        }
+
+        public override string PrepareDataToStore()
+        {
+            var dataStringBuilder = new StringBuilder();
+            dataStringBuilder.AppendLine(PrefixFigureType + GraphicObjectsTypeType);
+            dataStringBuilder.AppendLine(PrefixSizeWidth + FigureRectangle.Size.Width);
+            dataStringBuilder.AppendLine(PrefixSizeHeight + FigureRectangle.Size.Height);
+            dataStringBuilder.AppendLine(PrefixLeftTopPointX + FigureRectangle.Location.X);
+            dataStringBuilder.AppendLine(PrefixLeftTopPointY + FigureRectangle.Location.Y);
+            dataStringBuilder.AppendLine(PrefixColor + ColorTranslator.ToOle(CurrentBrush.Color));
+            return dataStringBuilder.ToString();
+        }
     }
 
     public class Circle : Figure
     {
+        protected override GraphicObjectsTypes GraphicObjectsTypeType => GraphicObjectsTypes.Circle;
+
         public Circle(Color color, Point location) : base(color, location)
         {
+        }
+
+        public Circle() : base()
+        {
+            
         }
 
         public override bool IsPointInside(Point pointToCheck)
@@ -165,8 +228,15 @@ namespace USATU_OOP_LW_7
 
     public class Square : Figure
     {
+        protected override GraphicObjectsTypes GraphicObjectsTypeType => GraphicObjectsTypes.Square;
+
         public Square(Color color, Point location) : base(color, location)
         {
+        }
+        
+        public Square() : base()
+        {
+            
         }
 
         public override bool IsPointInside(Point pointToCheck)
@@ -182,8 +252,15 @@ namespace USATU_OOP_LW_7
 
     public class Triangle : Figure
     {
+        protected override GraphicObjectsTypes GraphicObjectsTypeType => GraphicObjectsTypes.Triangle;
+
         public Triangle(Color color, Point location) : base(color, location)
         {
+        }
+        
+        public Triangle() : base()
+        {
+            
         }
 
         public override bool IsPointInside(Point pointToCheck)
@@ -206,7 +283,13 @@ namespace USATU_OOP_LW_7
 
     public class Pentagon : Figure
     {
+        protected override GraphicObjectsTypes GraphicObjectsTypeType => GraphicObjectsTypes.Pentagon;
+
         public Pentagon(Color color, Point location) : base(color, location)
+        {
+        }
+        
+        public Pentagon() : base()
         {
         }
 
