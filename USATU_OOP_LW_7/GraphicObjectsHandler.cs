@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using CustomDoublyLinkedListLibrary;
 
 namespace USATU_OOP_LW_7;
@@ -9,13 +10,27 @@ public class GraphicObjectsHandler
     private bool _isMultipleSelectionEnabled;
     private readonly Size _backgroundSize;
     private readonly GraphicObjectsListAbstractFactory _graphicObjectsFactory = new GraphicObjectsListFactory();
+    private readonly StorageTools _storageTools;
 
-    public GraphicObjectsHandler(Size backgroundSize)
+    public GraphicObjectsHandler(Size backgroundSize, string selectedFile)
     {
         _backgroundSize = backgroundSize;
-        _graphicObjects = StorageTools.IsFileExists()
-            ? _graphicObjectsFactory.ParseGraphicObjects(StorageTools.GetFormattedDataFromStorage())
-            : new CustomDoublyLinkedList<GraphicObject>();
+        _storageTools = new StorageTools(selectedFile);
+        if (_storageTools.IsFileExists())
+        {
+            try
+            {
+                _graphicObjects =
+                    _graphicObjectsFactory.ParseGraphicObjects(_storageTools.GetFormattedDataFromStorage());
+                return;
+            }
+            catch (Exception e)
+            {
+                // ignored
+            }
+        }
+
+        _graphicObjects = new CustomDoublyLinkedList<GraphicObject>();
     }
 
     public void JoinSelectedGraphicObject()
@@ -190,7 +205,7 @@ public class GraphicObjectsHandler
 
     public void StoreData()
     {
-        StorageTools.WriteDataToStorage(_graphicObjectsFactory.PrepareDataToStore(_graphicObjects));
+        _storageTools.WriteDataToStorage(_graphicObjectsFactory.PrepareDataToStore(_graphicObjects));
     }
 
     private void UnselectAll()

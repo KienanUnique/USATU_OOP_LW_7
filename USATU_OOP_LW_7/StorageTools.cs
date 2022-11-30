@@ -4,18 +4,20 @@ using System.Text;
 
 namespace USATU_OOP_LW_7;
 
-public static class StorageTools
+public class StorageTools
 {
-    private const string FileName = "GraphicObjectsStorage.txt";
+    private string _fileName;
 
-    public static bool IsFileExists()
+    public StorageTools(string fileName) => _fileName = fileName;
+
+    public bool IsFileExists()
     {
-        return File.Exists(FileName);
+        return File.Exists(_fileName);
     }
 
-    public static StringReader GetFormattedDataFromStorage()
+    public StringReader GetFormattedDataFromStorage()
     {
-        var readText = File.ReadAllText(FileName);
+        var readText = File.ReadAllText(_fileName);
         readText = readText.Replace("\t", "");
         while (readText.Contains(Environment.NewLine + Environment.NewLine))
         {
@@ -33,8 +35,8 @@ public static class StorageTools
         return new StringReader(formattedText.ToString());
     }
 
-    public static void WriteDataToStorage(string data)
+    public void WriteDataToStorage(string data)
     {
-        File.WriteAllText(FileName, data);
+        File.WriteAllText(_fileName, data);
     }
 }
