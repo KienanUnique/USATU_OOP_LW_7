@@ -1,15 +1,23 @@
 ﻿using System.Drawing;
+using System.IO;
+using System.Text;
 using CustomDoublyLinkedListLibrary;
 
 namespace USATU_OOP_LW_7
 {
     public class GraphicObjectGroup : GraphicObject
     {
-        private readonly CustomDoublyLinkedList<GraphicObject> _graphicObjects = new();
+        private readonly GraphicObjectsList _graphicObjects;
 
         public GraphicObjectGroup()
         {
-            _isSelected = false;
+            _graphicObjects = new GraphicObjectsList();
+            IsSelected = false;
+        }
+        
+        public GraphicObjectGroup(StringReader stringReader)
+        {
+            _graphicObjects = new GraphicObjectsList(stringReader);
         }
 
         public override bool IsFigureOutside(Size backgroundSize)
@@ -83,27 +91,27 @@ namespace USATU_OOP_LW_7
             }
         }
 
-        public override bool IsSelected()
+        public override bool IsObjectSelected()
         {
-            return _isSelected;
+            return IsSelected;
         }
 
         public override void Select()
         {
-            _isSelected = true;
-            ChangeAllSelection(_isSelected);
+            IsSelected = true;
+            ChangeAllSelection(IsSelected);
         }
 
         public override void Unselect()
         {
-            _isSelected = false;
-            ChangeAllSelection(_isSelected);
+            IsSelected = false;
+            ChangeAllSelection(IsSelected);
         }
 
         public override void ProcessClick()
         {
-            _isSelected = !_isSelected;
-            ChangeAllSelection(_isSelected);
+            IsSelected = !IsSelected;
+            ChangeAllSelection(IsSelected);
         }
 
         public override bool IsPointInside(Point pointToCheck)
@@ -124,6 +132,14 @@ namespace USATU_OOP_LW_7
             return true;
         }
 
+        public override string GetDataToStore()
+        {
+            var dataStringBuilder = new StringBuilder();
+            dataStringBuilder.AppendLine(PrefixGraphicObjectsType + GraphicObjectsTypes.Group);
+            dataStringBuilder.Append(_graphicObjects.GetDataToStore());
+            return dataStringBuilder.ToString();
+        }
+
         public CustomDoublyLinkedList<GraphicObject> GetAllGraphicObjects()
         {
             return _graphicObjects;
@@ -139,11 +155,11 @@ namespace USATU_OOP_LW_7
         {
             for (var i = _graphicObjects.GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
             {
-                if (!newIsSelected && i.Current.IsSelected())
+                if (!newIsSelected && i.Current.IsObjectSelected())
                 {
                     i.Current.Unselect();
                 }
-                else if (newIsSelected && !i.Current.IsSelected())
+                else if (newIsSelected && !i.Current.IsObjectSelected())
                 {
                     i.Current.Select();
                 }

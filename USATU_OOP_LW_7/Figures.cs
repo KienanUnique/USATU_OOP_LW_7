@@ -1,4 +1,6 @@
 ﻿using System.Drawing;
+using System.IO;
+using System.Text;
 
 namespace USATU_OOP_LW_7
 {
@@ -34,9 +36,17 @@ namespace USATU_OOP_LW_7
     {
         protected Rectangle FigureRectangle;
         protected readonly SolidBrush CurrentBrush;
+        protected abstract Figures FigureType { get; }
 
         private readonly Size _defaultSize = new Size(50, 50);
         private readonly Size _minimumSize = new Size(10, 10);
+
+        private const string PrefixSizeWidth = "Size width: ";
+        private const string PrefixSizeHeight = "Size height: ";
+        private const string PrefixLeftTopPointX = "Left top point X: ";
+        private const string PrefixLeftTopPointY = "Left top point Y: ";
+        private const string PrefixColor = "Color: ";
+        private const string PrefixFigureType = "Figure type: ";
 
         protected Figure(Color color, Point centerLocation)
         {
@@ -44,6 +54,18 @@ namespace USATU_OOP_LW_7
                 centerLocation.Y - _defaultSize.Height / 2);
             FigureRectangle = new Rectangle(leftTopPoint, _defaultSize);
             CurrentBrush = new SolidBrush(color);
+        }
+
+        protected Figure(StringReader dataStringReader)
+        {
+            int.TryParse(dataStringReader.ReadLine(), out int readWidth);
+            int.TryParse(dataStringReader.ReadLine(), out int readHeight);
+            int.TryParse(dataStringReader.ReadLine(), out int readLocationX);
+            int.TryParse(dataStringReader.ReadLine(), out int readLocationY);
+            int.TryParse(dataStringReader.ReadLine(), out int readColor);
+            FigureRectangle.Size = new Size(readWidth, readHeight);
+            FigureRectangle.Location = new Point(readLocationX, readLocationY);
+            CurrentBrush = new SolidBrush(ColorTranslator.FromOle(readColor));
         }
 
         public override bool IsFigureOutside(Size backgroundSize)
@@ -105,30 +127,30 @@ namespace USATU_OOP_LW_7
         public override void DrawOnGraphics(Graphics graphics)
         {
             DrawFigureOnGraphics(graphics);
-            if (_isSelected)
+            if (IsSelected)
             {
                 DrawSelectionBorders(graphics);
             }
         }
 
-        public override bool IsSelected()
+        public override bool IsObjectSelected()
         {
-            return _isSelected;
+            return IsSelected;
         }
 
         public override void Select()
         {
-            _isSelected = true;
+            IsSelected = true;
         }
 
         public override void Unselect()
         {
-            _isSelected = false;
+            IsSelected = false;
         }
 
         public override void ProcessClick()
         {
-            _isSelected = !_isSelected;
+            IsSelected = !IsSelected;
         }
 
         protected abstract void DrawFigureOnGraphics(Graphics graphics);
@@ -154,11 +176,30 @@ namespace USATU_OOP_LW_7
         {
             return false;
         }
+
+        public override string GetDataToStore()
+        {
+            var dataStringBuilder = new StringBuilder();
+            dataStringBuilder.AppendLine(PrefixGraphicObjectsType + GraphicObjectsTypes.Figure);
+            dataStringBuilder.AppendLine(PrefixFigureType + FigureType);
+            dataStringBuilder.AppendLine(PrefixSizeWidth + FigureRectangle.Size.Width);
+            dataStringBuilder.AppendLine(PrefixSizeHeight + FigureRectangle.Size.Height);
+            dataStringBuilder.AppendLine(PrefixLeftTopPointX + FigureRectangle.Location.X);
+            dataStringBuilder.AppendLine(PrefixLeftTopPointY + FigureRectangle.Location.Y);
+            dataStringBuilder.AppendLine(PrefixColor + ColorTranslator.ToOle(CurrentBrush.Color));
+            return dataStringBuilder.ToString();
+        }
     }
 
     public class Circle : Figure
     {
+        protected override Figures FigureType => Figures.Circle;
+
         public Circle(Color color, Point location) : base(color, location)
+        {
+        }
+
+        public Circle(StringReader stringReader) : base(stringReader)
         {
         }
 
@@ -178,7 +219,13 @@ namespace USATU_OOP_LW_7
 
     public class Square : Figure
     {
+        protected override Figures FigureType => Figures.Square;
+
         public Square(Color color, Point location) : base(color, location)
+        {
+        }
+
+        public Square(StringReader stringReader) : base(stringReader)
         {
         }
 
@@ -195,7 +242,13 @@ namespace USATU_OOP_LW_7
 
     public class Triangle : Figure
     {
+        protected override Figures FigureType => Figures.Triangle;
+
         public Triangle(Color color, Point location) : base(color, location)
+        {
+        }
+
+        public Triangle(StringReader stringReader) : base(stringReader)
         {
         }
 
@@ -219,7 +272,13 @@ namespace USATU_OOP_LW_7
 
     public class Pentagon : Figure
     {
+        protected override Figures FigureType => Figures.Pentagon;
+
         public Pentagon(Color color, Point location) : base(color, location)
+        {
+        }
+
+        public Pentagon(StringReader stringReader) : base(stringReader)
         {
         }
 

@@ -136,5 +136,10 @@ namespace USATU_OOP_LW_7
                 controlCurrentColor.BackColor = colorDialog.Color;
             }
         }
+
+        private void FormMain_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            _graphicObjectGroup.StoreData();
+        }
     }
 }

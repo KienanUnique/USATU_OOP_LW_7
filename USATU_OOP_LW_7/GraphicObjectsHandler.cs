@@ -1,16 +1,20 @@
 ﻿using System.Drawing;
-using CustomDoublyLinkedListLibrary;
 
 namespace USATU_OOP_LW_7;
 
 public class GraphicObjectsHandler
 {
-    private readonly CustomDoublyLinkedList<GraphicObject> _graphicObjects = new();
+    private readonly GraphicObjectsList _graphicObjects;
     private bool _isMultipleSelectionEnabled;
     private readonly Size _backgroundSize;
 
-    public GraphicObjectsHandler(Size backgroundSize) =>
+    public GraphicObjectsHandler(Size backgroundSize)
+    {
         _backgroundSize = backgroundSize;
+        _graphicObjects = StorageTools.IsFileExists()
+            ? new GraphicObjectsList(StorageTools.GetFormattedDataFromStorage())
+            : new GraphicObjectsList();
+    }
 
     public void JoinSelectedGraphicObject()
     {
@@ -22,7 +26,7 @@ public class GraphicObjectsHandler
         var newGraphicObjectGroup = new GraphicObjectGroup();
         for (var i = _graphicObjects.GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
         {
-            if (i.Current.IsSelected())
+            if (i.Current.IsObjectSelected())
             {
                 newGraphicObjectGroup.AddGraphicObject(i.Current);
                 _graphicObjects.RemovePointerElement(i);
@@ -37,7 +41,7 @@ public class GraphicObjectsHandler
     {
         for (var i = _graphicObjects.GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
         {
-            if (i.Current.IsSelected() && i.Current.IsGroup())
+            if (i.Current.IsObjectSelected() && i.Current.IsGroup())
             {
                 var currentGroupList = ((GraphicObjectGroup) i.Current).GetAllGraphicObjects();
                 _graphicObjects.InsertListBeforePointer(currentGroupList, i);
@@ -74,7 +78,7 @@ public class GraphicObjectsHandler
             if (i.Current.IsPointInside(clickPoint))
             {
                 wasOnObject = true;
-                if (!i.Current.IsSelected() && !_isMultipleSelectionEnabled)
+                if (!i.Current.IsObjectSelected() && !_isMultipleSelectionEnabled)
                 {
                     UnselectAll();
                 }
@@ -121,11 +125,11 @@ public class GraphicObjectsHandler
         {
             if (i.Current.IsPointInside(clickLocation))
             {
-                if (i.Current.IsSelected())
+                if (i.Current.IsObjectSelected())
                 {
                     for (var k = _graphicObjects.GetPointerOnBeginning(); !k.IsBorderReached(); k.MoveNext())
                     {
-                        if (k.Current.IsSelected())
+                        if (k.Current.IsObjectSelected())
                         {
                             k.Current.Color(color);
                         }
@@ -153,7 +157,7 @@ public class GraphicObjectsHandler
     {
         for (var i = _graphicObjects.GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
         {
-            if (i.Current.IsSelected() && i.Current.IsResizePossible(changeSizeK, resizeAction, _backgroundSize))
+            if (i.Current.IsObjectSelected() && i.Current.IsResizePossible(changeSizeK, resizeAction, _backgroundSize))
             {
                 i.Current.Resize(changeSizeK, resizeAction);
             }
@@ -164,7 +168,7 @@ public class GraphicObjectsHandler
     {
         for (var i = _graphicObjects.GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
         {
-            if (i.Current.IsSelected() && i.Current.IsMovePossible(moveVector, _backgroundSize))
+            if (i.Current.IsObjectSelected() && i.Current.IsMovePossible(moveVector, _backgroundSize))
             {
                 i.Current.Move(moveVector);
             }
@@ -175,18 +179,23 @@ public class GraphicObjectsHandler
     {
         for (var i = _graphicObjects.GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
         {
-            if (i.Current.IsSelected())
+            if (i.Current.IsObjectSelected())
             {
                 _graphicObjects.RemovePointerElement(i);
             }
         }
     }
 
+    public void StoreData()
+    {
+        StorageTools.WriteDataToStorage(_graphicObjects.GetDataToStore());
+    }
+
     private void UnselectAll()
     {
         for (var i = _graphicObjects.GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
         {
-            if (i.Current.IsSelected())
+            if (i.Current.IsObjectSelected())
             {
                 i.Current.Unselect();
             }
@@ -198,7 +207,7 @@ public class GraphicObjectsHandler
         bool wasOneSelectedObjectPassed = false;
         for (var i = _graphicObjects.GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
         {
-            if (!i.Current.IsSelected()) continue;
+            if (!i.Current.IsObjectSelected()) continue;
             if (wasOneSelectedObjectPassed)
             {
                 return false;
