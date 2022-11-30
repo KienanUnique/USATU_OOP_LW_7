@@ -1,26 +1,24 @@
 ﻿using System;
 using System.IO;
+using CustomDoublyLinkedListLibrary;
 
 namespace USATU_OOP_LW_7;
 
-public class GraphicObjectsList : GraphicObjectsListAbstractFactory
+public class GraphicObjectsListFactory : GraphicObjectsListAbstractFactory
 {
-    public GraphicObjectsList() : base()
+    public override CustomDoublyLinkedList<GraphicObject> ParseGraphicObjects(StringReader dataStringReader)
     {
-    }
+        CustomDoublyLinkedList<GraphicObject> parsedData = new();
 
-    public GraphicObjectsList(StringReader dataStringReader) : base()
-    {
         int.TryParse(dataStringReader.ReadLine(), out int countOfElements);
-
         for (int i = 0; i < countOfElements; i++)
         {
             Enum.TryParse(dataStringReader.ReadLine(), out GraphicObjectsTypes objectType);
             switch (objectType)
             {
                 case GraphicObjectsTypes.Group:
-                    var newGroup = new GraphicObjectGroup(dataStringReader);
-                    Add(newGroup);
+                    var newGroup = new GraphicObjectGroup(ParseGraphicObjects(dataStringReader), this);
+                    parsedData.Add(newGroup);
                     break;
                 case GraphicObjectsTypes.Figure:
                     Enum.TryParse(dataStringReader.ReadLine(), out Figures figureType);
@@ -33,9 +31,11 @@ public class GraphicObjectsList : GraphicObjectsListAbstractFactory
                         _ => null
                     };
 
-                    Add(newFigure);
+                    parsedData.Add(newFigure);
                     break;
             }
         }
+
+        return parsedData;
     }
 }

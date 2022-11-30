@@ -7,18 +7,26 @@ namespace USATU_OOP_LW_7
 {
     public class GraphicObjectGroup : GraphicObject
     {
-        private readonly GraphicObjectsList _graphicObjects;
+        private readonly CustomDoublyLinkedList<GraphicObject> _graphicObjects;
+        private readonly GraphicObjectsListAbstractFactory _graphicObjectsListAbstractFactory;
 
-        public GraphicObjectGroup()
+        public GraphicObjectGroup(GraphicObjectsListAbstractFactory graphicObjectsListAbstractFactory)
         {
-            _graphicObjects = new GraphicObjectsList();
+            _graphicObjects = new CustomDoublyLinkedList<GraphicObject>();
+            _graphicObjectsListAbstractFactory = graphicObjectsListAbstractFactory;
             IsSelected = false;
         }
-        
-        public GraphicObjectGroup(StringReader stringReader)
+
+        public GraphicObjectGroup(StringReader stringReader,
+            GraphicObjectsListAbstractFactory graphicObjectsListAbstractFactory)
         {
-            _graphicObjects = new GraphicObjectsList(stringReader);
+            _graphicObjects = graphicObjectsListAbstractFactory.ParseGraphicObjects(stringReader);
+            IsSelected = false;
         }
+
+        public GraphicObjectGroup(CustomDoublyLinkedList<GraphicObject> graphicObjects,
+            GraphicObjectsListAbstractFactory graphicObjectsListAbstractFactory) =>
+            (_graphicObjects, _graphicObjectsListAbstractFactory) = (graphicObjects, graphicObjectsListAbstractFactory);
 
         public override bool IsFigureOutside(Size backgroundSize)
         {
@@ -132,11 +140,11 @@ namespace USATU_OOP_LW_7
             return true;
         }
 
-        public override string GetDataToStore()
+        public override string PrepareDataToStore()
         {
             var dataStringBuilder = new StringBuilder();
             dataStringBuilder.AppendLine(PrefixGraphicObjectsType + GraphicObjectsTypes.Group);
-            dataStringBuilder.Append(_graphicObjects.GetDataToStore());
+            dataStringBuilder.Append(_graphicObjectsListAbstractFactory.PrepareDataToStore(_graphicObjects));
             return dataStringBuilder.ToString();
         }
 

@@ -1,22 +1,25 @@
-﻿using System.Text;
+﻿using System.IO;
+using System.Text;
 using CustomDoublyLinkedListLibrary;
 
 namespace USATU_OOP_LW_7;
 
-public abstract class GraphicObjectsListAbstractFactory : CustomDoublyLinkedList<GraphicObject>, IStorableObject
+public abstract class GraphicObjectsListAbstractFactory
 {
     private const string CountPrefix = "Count: ";
 
-    public string GetDataToStore()
+    public abstract CustomDoublyLinkedList<GraphicObject> ParseGraphicObjects(StringReader dataStringReader);
+
+    public string PrepareDataToStore(CustomDoublyLinkedList<GraphicObject> graphicObjects)
     {
         var allDataBuilder = new StringBuilder();
-        allDataBuilder.AppendLine(CountPrefix + Count);
+        allDataBuilder.AppendLine(CountPrefix + graphicObjects.Count);
         allDataBuilder.AppendLine();
 
         var objectsDataBuilder = new StringBuilder();
-        for (var i = GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
+        for (var i = graphicObjects.GetPointerOnBeginning(); !i.IsBorderReached(); i.MoveNext())
         {
-            objectsDataBuilder.AppendLine(i.Current.GetDataToStore());
+            objectsDataBuilder.AppendLine(i.Current.PrepareDataToStore());
         }
 
         objectsDataBuilder.Replace("\n", "\n\t");

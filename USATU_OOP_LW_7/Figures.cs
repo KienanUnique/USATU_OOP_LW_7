@@ -177,7 +177,7 @@ namespace USATU_OOP_LW_7
             return false;
         }
 
-        public override string GetDataToStore()
+        public override string PrepareDataToStore()
         {
             var dataStringBuilder = new StringBuilder();
             dataStringBuilder.AppendLine(PrefixGraphicObjectsType + GraphicObjectsTypes.Figure);

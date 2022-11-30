@@ -15,7 +15,7 @@ public enum ResizeAction
     Decrease
 }
 
-public abstract class GraphicObject : IStorableObject
+public abstract class GraphicObject
 {
     protected bool IsSelected;
     protected const string PrefixGraphicObjectsType = "Type: ";
@@ -32,5 +32,5 @@ public abstract class GraphicObject : IStorableObject
     public abstract void ProcessClick();
     public abstract bool IsPointInside(Point pointToCheck);
     public abstract bool IsGroup();
-    public abstract string GetDataToStore();
+    public abstract string PrepareDataToStore();
 }
