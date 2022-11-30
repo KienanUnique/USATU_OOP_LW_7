@@ -61,26 +61,26 @@ namespace USATU_OOP_LW_7
             panelForDrawing.Invalidate();
         }
 
-        private Figures GetSelectedFigureEnum()
+        private GraphicObjectsTypes GetSelectedFigureEnum()
         {
             if (radioButtonCircle.Checked)
             {
-                return Figures.Circle;
+                return GraphicObjectsTypes.Circle;
             }
             else if (radioButtonTriangle.Checked)
             {
-                return Figures.Triangle;
+                return GraphicObjectsTypes.Triangle;
             }
             else if (radioButtonSquare.Checked)
             {
-                return Figures.Square;
+                return GraphicObjectsTypes.Square;
             }
             else if (radioButtonPentagon.Checked)
             {
-                return Figures.Pentagon;
+                return GraphicObjectsTypes.Pentagon;
             }
 
-            return Figures.None;
+            return GraphicObjectsTypes.None;
         }
 
         private void panelForDrawing_MouseClick(object sender, MouseEventArgs e)

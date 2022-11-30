@@ -3,12 +3,6 @@ using System.IO;
 
 namespace USATU_OOP_LW_7;
 
-public enum GraphicObjectsTypes
-{
-    Figure,
-    Group
-}
-
 public enum ResizeAction
 {
     Increase,
@@ -33,4 +27,5 @@ public abstract class GraphicObject
     public abstract bool IsPointInside(Point pointToCheck);
     public abstract bool IsGroup();
     public abstract string PrepareDataToStore();
+    public abstract void loadData(StringReader dataStringReader);
 }

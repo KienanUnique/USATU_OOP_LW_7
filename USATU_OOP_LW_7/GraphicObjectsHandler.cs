@@ -6,10 +6,10 @@ namespace USATU_OOP_LW_7;
 
 public class GraphicObjectsHandler
 {
-    private readonly CustomDoublyLinkedList<GraphicObject> _graphicObjects;
+    private readonly GraphicObjectsList _graphicObjects = new();
     private bool _isMultipleSelectionEnabled;
     private readonly Size _backgroundSize;
-    private readonly GraphicObjectsListAbstractFactory _graphicObjectsFactory = new GraphicObjectsListFactory();
+    private readonly GraphicObjectsAbstractFactory _graphicObjectsFactory = new GraphicObjectsFactory();
     private readonly StorageTools _storageTools;
 
     public GraphicObjectsHandler(Size backgroundSize, string selectedFile)
@@ -20,17 +20,14 @@ public class GraphicObjectsHandler
         {
             try
             {
-                _graphicObjects =
-                    _graphicObjectsFactory.ParseGraphicObjects(_storageTools.GetFormattedDataFromStorage());
-                return;
+                _graphicObjects.ParseGraphicObjects(_storageTools.GetFormattedDataFromStorage(),
+                    _graphicObjectsFactory);
             }
             catch (Exception e)
             {
                 // ignored
             }
         }
-
-        _graphicObjects = new CustomDoublyLinkedList<GraphicObject>();
     }
 
     public void JoinSelectedGraphicObject()
@@ -108,21 +105,21 @@ public class GraphicObjectsHandler
         return wasOnObject;
     }
 
-    public void AddFigure(Figures figureType, Color color, Point location)
+    public void AddFigure(GraphicObjectsTypes graphicObjectsTypeType, Color color, Point location)
     {
         Figure newFigure = null;
-        switch (figureType)
+        switch (graphicObjectsTypeType)
         {
-            case Figures.Circle:
+            case GraphicObjectsTypes.Circle:
                 newFigure = new Circle(color, location);
                 break;
-            case Figures.Square:
+            case GraphicObjectsTypes.Square:
                 newFigure = new Square(color, location);
                 break;
-            case Figures.Triangle:
+            case GraphicObjectsTypes.Triangle:
                 newFigure = new Triangle(color, location);
                 break;
-            case Figures.Pentagon:
+            case GraphicObjectsTypes.Pentagon:
                 newFigure = new Pentagon(color, location);
                 break;
         }
@@ -205,7 +202,7 @@ public class GraphicObjectsHandler
 
     public void StoreData()
     {
-        _storageTools.WriteDataToStorage(_graphicObjectsFactory.PrepareDataToStore(_graphicObjects));
+        _storageTools.WriteDataToStorage(_graphicObjects.PrepareDataToStore());
     }
 
     private void UnselectAll()

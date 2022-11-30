@@ -7,26 +7,20 @@ namespace USATU_OOP_LW_7
 {
     public class GraphicObjectGroup : GraphicObject
     {
-        private readonly CustomDoublyLinkedList<GraphicObject> _graphicObjects;
-        private readonly GraphicObjectsListAbstractFactory _graphicObjectsListAbstractFactory;
+        private readonly GraphicObjectsList _graphicObjects = new();
+        private readonly GraphicObjectsAbstractFactory _graphicObjectsFactory;
 
-        public GraphicObjectGroup(GraphicObjectsListAbstractFactory graphicObjectsListAbstractFactory)
+        public GraphicObjectGroup(GraphicObjectsAbstractFactory graphicObjectsFactory)
         {
-            _graphicObjects = new CustomDoublyLinkedList<GraphicObject>();
-            _graphicObjectsListAbstractFactory = graphicObjectsListAbstractFactory;
+            _graphicObjectsFactory = graphicObjectsFactory;
             IsSelected = false;
         }
 
-        public GraphicObjectGroup(StringReader stringReader,
-            GraphicObjectsListAbstractFactory graphicObjectsListAbstractFactory)
+        public override void loadData(StringReader dataStringReader)
         {
-            _graphicObjects = graphicObjectsListAbstractFactory.ParseGraphicObjects(stringReader);
+            _graphicObjects.ParseGraphicObjects(dataStringReader, _graphicObjectsFactory);
             IsSelected = false;
         }
-
-        public GraphicObjectGroup(CustomDoublyLinkedList<GraphicObject> graphicObjects,
-            GraphicObjectsListAbstractFactory graphicObjectsListAbstractFactory) =>
-            (_graphicObjects, _graphicObjectsListAbstractFactory) = (graphicObjects, graphicObjectsListAbstractFactory);
 
         public override bool IsFigureOutside(Size backgroundSize)
         {
@@ -144,7 +138,7 @@ namespace USATU_OOP_LW_7
         {
             var dataStringBuilder = new StringBuilder();
             dataStringBuilder.AppendLine(PrefixGraphicObjectsType + GraphicObjectsTypes.Group);
-            dataStringBuilder.Append(_graphicObjectsListAbstractFactory.PrepareDataToStore(_graphicObjects));
+            dataStringBuilder.Append(_graphicObjects.PrepareDataToStore());
             return dataStringBuilder.ToString();
         }
 
